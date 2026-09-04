@@ -1,5 +1,7 @@
 FROM dunglas/frankenphp:php8.4
 
+COPY Caddyfile /etc/frankenphp/Caddyfile
+
 # MySQL ke liye PDO extension install
 RUN install-php-extensions pdo_mysql
 
