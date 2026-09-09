@@ -1,7 +1,8 @@
 <?php
 require_once __DIR__ . '/../includes/admin_auth.php';
 if (!admin_is_authenticated()) redirect('login.php');
-if (is_post_request() && verify_csrf_token($_POST['csrf_token'] ?? null)) {
+if (is_post_request()) {
+	if (!verify_csrf_token($_POST['csrf_token'] ?? null)) forbidden_request();
 	admin_logout();
 	redirect('login.php');
 }

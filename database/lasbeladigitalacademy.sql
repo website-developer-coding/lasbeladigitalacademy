@@ -1,4 +1,4 @@
-﻿
+
 
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -138,6 +138,9 @@ CREATE TABLE `contact_messages` (
     KEY `idx_contact_messages_email` (`email`),
     KEY `idx_contact_messages_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `admins` (`name`, `email`, `password`)
+VALUES ('Administrator', 'lasbeladigitalacademy@gmail.com', '$2y$10$AFJoPBqgxfc0TE5Lu4A6h.ndDrmDsa5Q4GhNSshbxsThs/dC28v32');
 
 INSERT INTO `courses`
     (`title`, `slug`, `category`, `short_description`, `description`, `duration`, `level`, `image`, `status`)

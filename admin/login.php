@@ -8,6 +8,8 @@ if (admin_is_authenticated()) {
 }
 
 $error = null;
+$loginAttempts = $_SESSION['login_attempts'] ?? [];
+$loginAttempts = array_values(array_filter($loginAttempts, static fn ($time): bool => $time > time() - 900));
 
 // Login nonce create karein
 if (empty($_SESSION['login_nonce'])) {
@@ -21,7 +23,9 @@ if (is_post_request()) {
     $password = (string) ($_POST['password'] ?? '');
 
     // CSRF aur login nonce verify karein
-    if (
+    if (count($loginAttempts) >= 5) {
+        $error = 'Too many attempts. Please wait 15 minutes and try again.';
+    } elseif (
         !verify_csrf_token($_POST['csrf_token'] ?? null) ||
         !hash_equals(
             $_SESSION['login_nonce'],
@@ -61,11 +65,14 @@ if (is_post_request()) {
 
             // Login nonce remove karein
             unset($_SESSION['login_nonce']);
+            unset($_SESSION['login_attempts']);
 
             // Dashboard par redirect
             redirect('dashboard.php');
         }
 
+        $loginAttempts[] = time();
+        $_SESSION['login_attempts'] = $loginAttempts;
         $error = 'Unable to sign in. Please check your credentials.';
     }
 }
@@ -198,27 +205,6 @@ if (is_post_request()) {
             <?php endif; ?>
 
 
-            <!-- Demo Login Information -->
-            <div class="demo-info mb-4">
-
-                <div class="fw-bold mb-2">
-                    <i class="bi bi-info-circle me-1"></i>
-                    Demo Login
-                </div>
-
-                <div>
-                    <strong>Email:</strong>
-                    admin@gmail.com
-                </div>
-
-                <div>
-                    <strong>Password:</strong>
-                    admin123
-                </div>
-
-            </div>
-
-
             <!-- Login Form -->
             <form
                 method="post"
@@ -261,7 +247,7 @@ if (is_post_request()) {
                             type="email"
                             id="email"
                             name="email"
-                            value="<?= old('email', 'admin@gmail.com') ?>"
+                            value="<?= old('email') ?>"
                             required
                             autocomplete="username"
                         >
@@ -292,7 +278,6 @@ if (is_post_request()) {
                             type="password"
                             id="password"
                             name="password"
-                            value="admin123"
                             required
                             autocomplete="current-password"
                         >

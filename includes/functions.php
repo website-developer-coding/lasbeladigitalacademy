@@ -3,6 +3,8 @@
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
 	ini_set('session.use_strict_mode', '1');
+	ini_set('session.use_only_cookies', '1');
+	ini_set('session.cookie_httponly', '1');
 	$sessionCookie = session_get_cookie_params();
 	session_set_cookie_params([
 		'lifetime' => $sessionCookie['lifetime'],
@@ -15,6 +17,12 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 	session_start();
 }
 
+if (!headers_sent()) {
+	header('X-Content-Type-Options: nosniff');
+	header('X-Frame-Options: SAMEORIGIN');
+	header('Referrer-Policy: strict-origin-when-cross-origin');
+}
+
 function e($value): string
 {
 	return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
@@ -24,6 +32,12 @@ function redirect(string $url): void
 {
 	header('Location: ' . $url);
 	exit;
+}
+
+function forbidden_request(): never
+{
+	http_response_code(403);
+	exit('Forbidden.');
 }
 
 function csrf_token(): string

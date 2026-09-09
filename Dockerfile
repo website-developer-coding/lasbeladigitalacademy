@@ -8,9 +8,8 @@ RUN install-php-extensions pdo_mysql
 # Project ki tamam files container mein copy
 COPY . /app
 
-# Keep the bundled demo uploads in the runtime path used by the PHP app.
-RUN mkdir -p /app/uploads \
-	&& if [ -d /app/.github/uploads ]; then cp -R /app/.github/uploads/. /app/uploads/; fi
+# Ensure upload directories exist when a persistent Railway Volume is mounted.
+RUN mkdir -p /app/uploads/courses /app/uploads/gallery /app/uploads/services
 
 # Project directory
 WORKDIR /app
